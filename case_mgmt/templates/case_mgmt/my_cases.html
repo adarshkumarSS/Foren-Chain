@@ -1,0 +1,61 @@
+{% extends 'case_mgmt/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>My Cases</h2>
+        <div class="btn-group" role="group">
+            <a href="{% url 'my_cases' %}" class="btn btn-outline-secondary {% if not status_filter %}active{% endif %}">All</a>
+            <a href="{% url 'my_cases' %}?status=active" class="btn btn-outline-success {% if status_filter == 'active' %}active{% endif %}">Active</a>
+            <a href="{% url 'my_cases' %}?status=closed" class="btn btn-outline-danger {% if status_filter == 'closed' %}active{% endif %}">Closed</a>
+            <a href="{% url 'my_cases' %}?status=archived" class="btn btn-outline-secondary {% if status_filter == 'archived' %}active{% endif %}">Archived</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                {% if cases %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Case Name</th>
+                                    <th>Case Number</th>
+                                    <th>Status</th>
+                                    <th>Type</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for case in cases %}
+                                    <tr>
+                                        <td><a href="{% url 'case_detail' case.id %}">{{ case.name }}</a></td>
+                                        <td>{{ case.case_number }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if case.status == 'active' %}success{% elif case.status == 'closed' %}danger{% else %}secondary{% endif %}">
+                                                {{ case.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ case.get_case_type_display }}</td>
+                                        <td>{{ case.created_at|date:"Y-m-d" }}</td>
+                                        <td>
+                                            <a href="{% url 'case_detail' case.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="{% url 'update_case' case.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No cases found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

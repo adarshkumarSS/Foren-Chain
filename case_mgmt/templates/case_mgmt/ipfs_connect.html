@@ -1,0 +1,38 @@
+{% extends 'case_mgmt/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Connect to Pinata IPFS</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        {% if user.is_ipfs_connected %}Update Credentials{% else %}Connect{% endif %}
+                    </button>
+                </form>
+                
+                {% if user.is_ipfs_connected %}
+                    <div class="alert alert-success mt-3">
+                        <i class="bi bi-check-circle-fill"></i> Successfully connected to Pinata IPFS
+                    </div>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <h5>About Pinata IPFS</h5>
+                    <p>Pinata provides simple IPFS pinning services. You'll need:</p>
+                    <ol>
+                        <li>A Pinata account (sign up at <a href="https://pinata.cloud" target="_blank">pinata.cloud</a>)</li>
+                        <li>Your API Key and Secret from the Pinata dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

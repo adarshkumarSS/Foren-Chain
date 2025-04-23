@@ -1,0 +1,35 @@
+{% extends 'case_mgmt/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Notifications</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                {% if notifications %}
+                    <div class="list-group">
+                        {% for notification in notifications %}
+                            <a href="{% url 'mark_notification_read' notification.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">{{ notification.message }}</h6>
+                                        <small class="text-muted">Case: {{ notification.case.name }}</small>
+                                    </div>
+                                    <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No unread notifications.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

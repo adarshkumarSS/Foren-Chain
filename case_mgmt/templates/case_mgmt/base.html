@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Forensic Case Management System</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">FDM-GOV</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home' %}">Home</a>
+                        </li>
+                        {% if user.role == 'forensic' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'my_cases' %}">My Cases</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'create_case' %}">New Case</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'ipfs_connect' %}">
+                                {% if user.is_ipfs_connected %}
+                                    <i class="bi bi-plug-fill text-success"></i> IPFS Connected
+                                {% else %}
+                                    <i class="bi bi-plug"></i> Connect to IPFS
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{% url 'notifications' %}">
+                                <i class="bi bi-bell"></i>
+                                {% if user.unread_notifications_count > 0 %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ user.unread_notifications_count }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ user.username }} ({{ user.get_role_display }})
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <h5 class="mb-3">Forensic Case Management System</h5>
+                    <p class="small">Secure digital evidence management powered by IPFS</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">&copy; {% now "Y" %} All rights reserved</p>
+                    <div class="mt-2">
+                        <a href="#" class="text-white me-2"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    {% block scripts %}{% endblock %}
+
+    <nav class="navbar fixed-bottom navbar-dark bg-dark d-block d-lg-none">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-around w-100">
+                <a href="{% url 'home' %}" class="nav-link text-center">
+                    <i class="bi bi-house-door fs-4"></i>
+                    <span class="d-block small">Home</span>
+                </a>
+                {% if user.role == 'forensic' %}
+                <a href="{% url 'my_cases' %}" class="nav-link text-center">
+                    <i class="bi bi-folder fs-4"></i>
+                    <span class="d-block small">Cases</span>
+                </a>
+                <a href="{% url 'create_case' %}" class="nav-link text-center">
+                    <i class="bi bi-plus-circle fs-4"></i>
+                    <span class="d-block small">New</span>
+                </a>
+                {% endif %}
+                <a href="{% url 'ipfs_connect' %}" class="nav-link text-center">
+                    <i class="bi bi-{% if user.is_ipfs_connected %}plug-fill text-success{% else %}plug{% endif %} fs-4"></i>
+                    <span class="d-block small">IPFS</span>
+                </a>
+                <a href="{% url 'notifications' %}" class="nav-link text-center position-relative">
+                    <i class="bi bi-bell fs-4"></i>
+                    {% if user.unread_notifications_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.5rem;">
+                        {{ user.unread_notifications_count }}
+                    </span>
+                    {% endif %}
+                    <span class="d-block small">Alerts</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+</body>
+</html>

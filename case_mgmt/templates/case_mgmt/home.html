@@ -1,0 +1,83 @@
+{% extends 'case_mgmt/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Welcome, {{ user.username }}!</h2>
+        <p class="text-muted">Role: {{ user.get_role_display }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Search Cases</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search_query" placeholder="Search by case name or number...">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Recent Cases</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_cases %}
+                    <div class="list-group">
+                        {% for recent_case in recent_cases %}
+                            <a href="{% url 'case_detail' recent_case.case.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ recent_case.case.name }}</h6>
+                                    <small class="text-muted">{{ recent_case.viewed_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">{{ recent_case.case.description|truncatechars:100 }}</p>
+                                <small class="text-muted">Case #{{ recent_case.case.case_number }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent cases viewed.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if user.role == 'forensic' %}
+                    <a href="{% url 'create_case' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-plus-circle"></i> Create New Case
+                    </a>
+                {% endif %}
+                <a href="{% url 'ipfs_connect' %}" class="btn btn-{% if user.is_ipfs_connected %}success{% else %}warning{% endif %} w-100 mb-2">
+                    <i class="bi bi-{% if user.is_ipfs_connected %}plug-fill{% else %}plug{% endif %}"></i>
+                    {% if user.is_ipfs_connected %}IPFS Connected{% else %}Connect to IPFS{% endif %}
+                </a>
+                <a href="{% url 'notifications' %}" class="btn btn-info w-100 position-relative">
+                    <i class="bi bi-bell"></i> Notifications
+                    {% if user.unread_notifications_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ user.unread_notifications_count }}
+                        </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

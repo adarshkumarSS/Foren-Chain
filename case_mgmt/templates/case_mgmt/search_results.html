@@ -1,0 +1,42 @@
+{% extends 'case_mgmt/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Search Results for "{{ search_query }}"</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                {% if cases %}
+                    <div class="list-group">
+                        {% for case in cases %}
+                            <a href="{% url 'case_detail' case.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">{{ case.name }}</h6>
+                                        <small class="text-muted">Case #{{ case.case_number }}</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-{% if case.status == 'active' %}success{% elif case.status == 'closed' %}danger{% else %}secondary{% endif %}">
+                                            {{ case.get_status_display }}
+                                        </span>
+                                        <span class="badge bg-{% if case.case_type == 'public' %}info{% else %}warning{% endif %}">
+                                            {{ case.get_case_type_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No cases found matching your search.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
