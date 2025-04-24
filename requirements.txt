@@ -1,4 +1,14 @@
-Django==4.2.7
-requests==2.31.0
-django-crispy-forms==2.1
+asgiref==3.8.1
+certifi==2025.1.31
+chardet==5.2.0
+charset-normalizer==3.4.1
 crispy-bootstrap4==2024.1
+Django==4.2.7
+django-crispy-forms==2.1
+idna==3.10
+pillow==11.2.1
+reportlab==4.4.0
+requests==2.31.0
+sqlparse==0.5.3
+tzdata==2025.2
+urllib3==2.4.0

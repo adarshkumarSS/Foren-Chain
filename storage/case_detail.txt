@@ -1,0 +1,52 @@
+Case 1: Digital Fraud Investigation
+Case Name: "Online Investment Scam - GoldenReturns"
+Case Number: FDM-2023-001
+Type: Private
+Status: Active
+Location: Mumbai, India
+Description: Investigation into a Ponzi scheme operating through a fake investment portal that promised 200% returns. Over 500 victims identified with total losses exceeding ₹2.5 crore.
+
+
+Case 2: Cyberbullying Case
+Case Name: "Social Media Harassment - College Student"
+Case Number: FDM-2023-002
+Type: Public
+Status: Closed
+Location: Bengaluru, India
+Description: Investigation of anonymous social media accounts harassing a female engineering student. Case led to identification of 3 classmates involved.
+
+
+Case 3: Corporate Data Breach
+Case Name: "Pharma Company Trade Secrets Theft"
+Case Number: FDM-2023-003
+Type: Private
+Status: Active
+Location: Hyderabad, India
+Description: Unauthorized access to clinical trial data for a new cancer drug. Evidence suggests insider threat from a disgruntled employee.
+
+
+Case 4: Financial Document Forgery
+Case Name: "Bank Loan Fraud - Property Documents"
+Case Number: FDM-2023-004
+Type: Public
+Status: Archived
+Location: Delhi, India
+Description: Forgery of property documents to secure ₹1.8 crore bank loan. Used sophisticated Photoshop techniques to alter registry records.
+
+
+Case 5: Child Exploitation Material
+Case Name: "Online Predator Network Bust"
+Case Number: FDM-2023-005
+Type: Private
+Status: Closed
+Location: Pan-India Operation
+Description: Nationwide operation against a Telegram group sharing illegal content. 12 arrests made across 5 states.
+
+
+Case 6: Cryptocurrency Scam
+Case Name: "Fake Bitcoin Mining Operation"
+Case Number: FDM-2023-006
+Type: Public
+Status: Active
+Location: Chennai, India
+Description: Fake cloud mining operation that collected ₹5 crore from investors before disappearing.
