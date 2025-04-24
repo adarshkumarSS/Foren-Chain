@@ -10,6 +10,8 @@ from .forms import *
 import requests
 from datetime import datetime
 import json
+import os
+from .utils import build_pdf_content
 
 # case_mgmt/views.py
 
@@ -396,3 +398,130 @@ def upload_file_view(request, case_id):
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
+@login_required
+def add_disclosure_form(request, case_id):
+    case = get_object_or_404(Case, id=case_id)
+    
+    if request.method == 'POST' and request.user.role == 'police':
+        form = DisclosureFormForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                # Temporary save signature
+                signature_file = request.FILES['signature_image']
+                temp_signature_path = f"/tmp/{signature_file.name}"
+                with open(temp_signature_path, 'wb+') as destination:
+                    for chunk in signature_file.chunks():
+                        destination.write(chunk)
+                
+                # Upload signature to IPFS
+                signature_url = f"https://api.pinata.cloud/pinning/pinFileToIPFS"
+                with open(temp_signature_path, 'rb') as sig_file:
+                    signature_response = requests.post(
+                        signature_url,
+                        files={'file': sig_file},
+                        headers={
+                            'pinata_api_key': request.user.pinata_api_key,
+                            'pinata_secret_api_key': request.user.pinata_secret
+                        }
+                    )
+                os.remove(temp_signature_path)  # Clean up temp file
+                
+                if signature_response.status_code != 200:
+                    raise Exception("Signature upload failed")
+                
+                signature_cid = signature_response.json()['IpfsHash']
+                
+                # Generate PDF with signature
+                signature_url = f"https://gateway.pinata.cloud/ipfs/{signature_cid}"
+                temp_pdf_path = "/tmp/disclosure_temp.pdf"
+                pdf_content = build_pdf_content(case, request.user, signature_url)
+                
+                with open(temp_pdf_path, 'wb') as pdf_file:
+                    pdf_file.write(pdf_content)
+                
+                # Upload PDF to IPFS
+                with open(temp_pdf_path, 'rb') as pdf_file:
+                    pdf_response = requests.post(
+                        signature_url,
+                        files={'file': pdf_file},
+                        headers={
+                            'pinata_api_key': request.user.pinata_api_key,
+                            'pinata_secret_api_key': request.user.pinata_secret
+                        }
+                    )
+                os.remove(temp_pdf_path)  # Clean up temp file
+                
+                if pdf_response.status_code != 200:
+                    raise Exception("PDF upload failed")
+                
+                pdf_cid = pdf_response.json()['IpfsHash']
+                
+                # Save disclosure form
+                disclosure = DisclosureForm.objects.create(
+                    case=case,
+                    added_by=request.user,
+                    form_pdf_cid=pdf_cid,
+                    signature_image_cid=signature_cid,
+                    form_name=form.cleaned_data['form_name'],
+                    remarks=form.cleaned_data['remarks']
+                )
+                
+                # Notify court users
+                court_users = CustomUser.objects.filter(role='court')
+                for user in court_users:
+                    Notification.objects.create(
+                        user=user,
+                        case=case,
+                        message=f"New disclosure form added by {request.user.username}"
+                    )
+                
+                case.disclosure_added = True
+                case.disclosure_added_at = timezone.now()
+                case.disclosure_added_by = request.user
+                case.save()
+                
+                messages.success(request, 'Disclosure form added successfully!')
+                return redirect('case_detail', case_id=case.id)
+                
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+    else:
+        form = DisclosureFormForm()
+    
+    return render(request, 'case_mgmt/add_disclosure.html', {
+        'form': form,
+        'case': case
+    })
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        user_form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        if user_form.is_valid():
+            # Handle profile picture upload
+            if 'profile_picture' in request.FILES:
+                try:
+                    profile_file = request.FILES['profile_picture']
+                    response = requests.post(
+                        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+                        files={'file': profile_file},
+                        headers={
+                            'pinata_api_key': request.user.pinata_api_key,
+                            'pinata_secret_api_key': request.user.pinata_secret
+                        }
+                    )
+                    if response.status_code == 200:
+                        request.user.profile_picture_cid = response.json()['IpfsHash']
+                except Exception as e:
+                    messages.error(request, f"Error uploading profile picture: {str(e)}")
+            
+            user_form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        user_form = UserProfileForm(instance=request.user)
+    
+    return render(request, 'case_mgmt/profile.html', {
+        'user_form': user_form
+    })

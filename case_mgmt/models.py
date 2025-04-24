@@ -16,6 +16,9 @@ class CustomUser(AbstractUser):
     pinata_api_key = models.CharField(max_length=255, blank=True, null=True)
     pinata_secret = models.CharField(max_length=255, blank=True, null=True)
     is_ipfs_connected = models.BooleanField(default=False)
+    profile_picture_cid = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    department = models.CharField(max_length=100, blank=True)
 
     def unread_notifications_count(self):
         return self.notifications.filter(is_read=False).count()
@@ -42,6 +45,9 @@ class Case(models.Model):
     closed_at = models.DateTimeField(null=True, blank=True)
     archived_at = models.DateTimeField(null=True, blank=True)
     shared_with = models.ManyToManyField(CustomUser, related_name='shared_cases', blank=True)
+    disclosure_added = models.BooleanField(default=False)
+    disclosure_added_at = models.DateTimeField(null=True, blank=True)
+    disclosure_added_by = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL, related_name='disclosures_added')
 
 class CaseFile(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='files')
@@ -56,6 +62,11 @@ class DisclosureForm(models.Model):
     added_at = models.DateTimeField(auto_now_add=True)
     form_pdf_cid = models.CharField(max_length=255)
     form_name = models.CharField(max_length=255)
+    signature_image_cid = models.CharField(max_length=255, blank=True, null=True)  
+    remarks = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.form_name} - {self.case.name}"
 
 class CaseActivityLog(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='activity_logs')

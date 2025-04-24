@@ -69,6 +69,14 @@ class ShareCaseForm(forms.Form):
     email = forms.EmailField()
 
 class DisclosureFormForm(forms.ModelForm):
+    signature_image = forms.ImageField(required=True)
+    remarks = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)
+
     class Meta:
         model = DisclosureForm
-        fields = ['form_name']
+        fields = ['form_name', 'remarks']
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'department']

@@ -160,21 +160,46 @@
                     {% if case.disclosure_forms.exists %}
                         <div class="list-group mb-3">
                             {% for form in case.disclosure_forms.all %}
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <h6>{{ form.form_name }}</h6>
-                                            <small class="text-muted">Added by {{ form.added_by.username }} on {{ form.added_at }}</small>
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5>{{ form.form_name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Added by:</strong> {{ form.added_by.get_full_name }}</p>
+                                                <p><strong>Date:</strong> {{ form.added_at }}</p>
+                                                {% if form.remarks %}
+                                                <p><strong>Remarks:</strong> {{ form.remarks }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% if form.signature_image_cid %}
+                                                <div class="mb-3">
+                                                    <p class="mb-1"><strong>Officer Signature:</strong></p>
+                                                    <img src="https://gateway.pinata.cloud/ipfs/{{ form.signature_image_cid }}" 
+                                                        class="img-fluid border" style="max-height: 100px;">
+                                                </div>
+                                                {% endif %}
+                                                <a href="https://gateway.pinata.cloud/ipfs/{{ form.form_pdf_cid }}" 
+                                                target="_blank" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-download"></i> Download Full Disclosure
+                                                </a>
+                                            </div>
                                         </div>
-                                        <a href="https://gateway.pinata.cloud/ipfs/{{ form.form_pdf_cid }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-eye"></i> View
-                                        </a>
                                     </div>
                                 </div>
-                            {% endfor %}
+                                {% endfor %}
                         </div>
                     {% else %}
                         <p class="text-muted">No disclosure forms added yet.</p>
+                    {% endif %}
+                    {% if case.disclosure_added %}
+                        <div class="alert alert-success mb-3">
+                            <i class="bi bi-check-circle-fill"></i> 
+                            Disclosure added by {{ case.disclosure_added_by.username }} 
+                            on {{ case.disclosure_added_at|date:"Y-m-d H:i" }}
+                        </div>
                     {% endif %}
                     
                     {% if user.role == 'police' %}

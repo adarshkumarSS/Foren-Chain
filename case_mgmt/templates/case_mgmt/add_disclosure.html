@@ -3,31 +3,34 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow">
+    <div class="col-md-8">
+        <div class="card border-primary">
             <div class="card-header bg-primary text-white">
                 <h4 class="mb-0">Add Disclosure Form</h4>
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            {{ form.officer_name|as_crispy_field }}
+                    {{ form|crispy }}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Signature Upload</label>
+                        <div class="border p-3 text-center" style="background-color: #f8f9fa;">
+                            <div id="signature-preview" class="mb-2" style="min-height: 100px;">
+                                <p class="text-muted">Signature will appear here</p>
+                            </div>
+                            <input type="file" name="signature_image" id="id_signature_image" 
+                                   accept="image/*" class="form-control" required
+                                   onchange="previewSignature(this)">
                         </div>
-                        <div class="col-md-6">
-                            {{ form.officer_signature|as_crispy_field }}
-                            <small class="text-muted">Upload a clear image of your signature</small>
-                        </div>
-                        <div class="col-12">
-                            {{ form.notes|as_crispy_field }}
-                        </div>
+                        <small class="text-muted">Upload a clear image of your signature</small>
                     </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <button type="submit" class="btn btn-primary px-4">
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">
                             <i class="bi bi-save"></i> Submit Disclosure
                         </button>
-                        <a href="{% url 'case_detail' case.id %}" class="btn btn-outline-secondary px-4">
+                        <a href="{% url 'case_detail' case.id %}" class="btn btn-outline-secondary">
                             Cancel
                         </a>
                     </div>
@@ -36,4 +39,24 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function previewSignature(input) {
+    const preview = document.getElementById('signature-preview');
+    const file = input.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" class="img-fluid" 
+                                 style="max-height: 150px;" alt="Signature Preview">`;
+        }
+        
+        reader.readAsDataURL(file);
+    }
+}
+</script>
 {% endblock %}

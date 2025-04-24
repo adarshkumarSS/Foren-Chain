@@ -18,5 +18,8 @@ urlpatterns = [
     path('case/<int:case_id>/delete/', views.delete_case_view, name='delete_case'),
     path('case/<int:case_id>/update/', views.update_case_view, name='update_case'),
     path('case/<int:case_id>/upload-file/', views.upload_file_view, name='upload_file'),
+
+    path('case/<int:case_id>/add-disclosure/', views.add_disclosure_form, name='add_disclosure'),
+    path('profile/', views.profile, name='profile'),
   
 ]

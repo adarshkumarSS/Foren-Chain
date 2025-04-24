@@ -56,12 +56,22 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> {{ user.username }} ({{ user.get_role_display }})
+                                {% if user.profile_picture_cid %}
+                                <img src="https://gateway.pinata.cloud/ipfs/{{ user.profile_picture_cid }}" 
+                                     class="rounded-circle me-1" width="30" height="30" alt="Profile">
+                                {% else %}
+                                <i class="bi bi-person-circle"></i>
+                                {% endif %}
+                                {{ user.username }} ({{ user.get_role_display }})
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="bi bi-person me-2"></i>Profile
+                                </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -143,9 +153,12 @@
                     {% endif %}
                     <span class="d-block small">Alerts</span>
                 </a>
+                <a href="{% url 'profile' %}" class="nav-link text-center">
+                    <i class="bi bi-person fs-4"></i>
+                    <span class="d-block small">Profile</span>
+                </a>
             </div>
         </div>
     </nav>
-
 </body>
 </html>
